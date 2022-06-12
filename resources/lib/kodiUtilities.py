@@ -197,7 +197,16 @@ def kodiRpcToTraktMediaObject(type, data, mode='collected'):
         data['collected'] = 1  # this is in our kodi so it should be collected
         data['watched'] = 1 if data['plays'] > 0 else 0
         if 'uniqueid' in data:
-            data['ids'] = data.pop('uniqueid')
+            data['ids'] = {}
+            if 'tmdb' in data['uniqueid']:
+                data['ids']['tmdb'] = data['uniqueid']['tmdb']
+            if 'imdb' in data['uniqueid']:
+                data['ids']['imdb'] = data['uniqueid']['imdb']
+            if 'tvdb' in data['uniqueid']:
+                data['ids']['tvdb'] = data['uniqueid']['tvdb']
+            elif 'unknown' in data['uniqueid'] and data['uniqueid']['unknown'] != '':
+                data['ids'].update(utilities.guessBestTraktId(
+                    data['uniqueid']['unknown'], type)[0])
         elif 'imdbnumber' in data:
             id = data.pop('imdbnumber')
             data['ids'] = utilities.guessBestTraktId(id, type)[0]
